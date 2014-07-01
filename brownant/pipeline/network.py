@@ -91,10 +91,14 @@ class TextResponseProperty(PipelineProperty):
     def prepare(self):
         self.attr_names.setdefault("url_attr", "url")
         self.attr_names.setdefault("http_client_attr", "http_client")
+        self.options.setdefault("encoding", None)
 
     def provide_value(self, obj):
         url = self.get_attr(obj, "url_attr")
         http_client = self.get_attr(obj, "http_client_attr")
+        encoding = self.options.pop("encoding", None)
         response = http_client.get(url, **self.options)
         response.raise_for_status()
+        if encoding:
+            response.encoding = encoding
         return response.text
